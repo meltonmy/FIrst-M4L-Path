@@ -7,7 +7,8 @@ export function skillTree(records:Readonly<Record<string,MasteryRecord>>,now:Dat
  return competencies.map(c=>{
   const r=records[c.id];
   const unlocked=c.prerequisites.every(p=>records[p]?.status==='proficient'||records[p]?.status==='review_due');
-  const state:SkillNode['state']=r?statusAt(r,now):unlocked?'available':'locked';
+  const status=r?statusAt(r,now):null;
+  const state:SkillNode['state']=status==='new'?(unlocked?'available':'locked'):(status??(unlocked?'available':'locked'));
   return {id:c.id,title:c.title,stageId:c.stageId,prerequisites:c.prerequisites,state};
  });
 }
