@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 test('opt-in learner profiles preserve V1 and isolate lesson completion across reloads',async({page})=>{
  await page.goto('/#profiles');
- await expect(page.getByRole('heading',{name:'Learner profiles'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Learner profiles',exact:true})).toBeVisible();
  await expect(page.getByRole('button',{name:'Enable profiles'})).toBeVisible();
  await page.getByRole('button',{name:'Enable profiles'}).click();
  // Empty browser has no V1 progress; activation must not silently initialize storage.
