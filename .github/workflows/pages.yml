@@ -1,6 +1,8 @@
 name: Deploy Linux Path to GitHub Pages
-# Deployment is opt-in: run this workflow manually after enabling Pages.
+# Deploy on main after the approved release merge; manual reruns remain available.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
