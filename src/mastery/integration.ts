@@ -15,7 +15,7 @@ export type LearningEvent={
 /** Atomically commit V2 lesson progress and its associated competency evidence in one storage write.
  * For V1-only users this is a normal V1 save; no mastery records are created.
  */
-export function saveLearningEvent(storage:Pick<Storage,'setItem'>,session:Session,next:Progress,event:LearningEvent):Session{
+export function saveLearningEvent(storage:Pick<Storage,'getItem'|'setItem'>,session:Session,next:Progress,event:LearningEvent):Session{
  if(!session.v2)return saveSession(storage,session,next);
  const legacy=validateProgress(next);
  const mapped=competencies.filter(c=>c.lessonIds.some(id=>id===event.lessonId));
