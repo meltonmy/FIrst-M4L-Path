@@ -6,7 +6,7 @@ describe('release data-integrity gates',()=>{
  it('rejects prototype-sensitive learner IDs and competency keys',()=>{
   const base=migrateV1(emptyProgress());
   const malicious=JSON.parse(JSON.stringify(base));
-  malicious.learners['__proto__']={...malicious.learners['original-learner'],id:'__proto__'};
+  Object.defineProperty(malicious.learners,'__proto__',{value:{...malicious.learners['original-learner'],id:'__proto__'},enumerable:true});
   expect(()=>validateV2(malicious)).toThrow(/Invalid Version 2 learner/);
   const other=JSON.parse(JSON.stringify(base));
   other.learners['original-learner'].competencies.constructor={};
