@@ -20,6 +20,7 @@ export type ProgressV2={
 export type MigrationResult={progress:ProgressV2|null;source:'v2'|'v1'|'empty'|'error';warning:string};
 type ReadWriteStorage=Pick<Storage,'getItem'|'setItem'>;
 
+function safeKey(id:string):boolean{return !['__proto__','constructor','prototype'].includes(id);}
 function object(value:unknown):value is Record<string,unknown>{
   return !!value && typeof value==='object' && !Array.isArray(value);
 }
@@ -43,11 +44,11 @@ export function validateV2(input:unknown):ProgressV2 {
   if(entries.length===0||entries.length>100||!Object.hasOwn(input.learners,input.activeLearnerId))throw Error('Invalid Version 2 learner list.');
   const learners:Record<string,LearnerV2>={};
   for(const [id,value] of entries){
-    if(!/^[a-zA-Z0-9_-]{1,80}$/.test(id)||!object(value)||value.id!==id||typeof value.displayName!=='string'||!value.displayName.trim()||value.displayName.length>80||!['kids','teen','adult'].includes(String(value.academy))||!object(value.competencies))throw Error('Invalid Version 2 learner.');
+    if(!/^[a-zA-Z0-9_-]{1,80}$/.test(id)||!safeKey(id)||!object(value)||value.id!==id||typeof value.displayName!=='string'||!value.displayName.trim()||value.displayName.length>80||!['kids','teen','adult'].includes(String(value.academy))||!object(value.competencies))throw Error('Invalid Version 2 learner.');
     const competencies:Record<string,MasteryRecord>={};
     if(Object.keys(value.competencies).length>1000)throw Error('Too many competency records.');
     for(const [cid,mastery] of Object.entries(value.competencies)){
-      if(!validMastery(mastery,cid))throw Error('Invalid mastery record.');
+      if(!safeKey(cid)||!validMastery(mastery,cid))throw Error('Invalid mastery record.');
       competencies[cid]=mastery;
     }
     learners[id]={id,displayName:value.displayName,academy:value.academy as LearnerV2['academy'],legacy:validateProgress(value.legacy),competencies};
