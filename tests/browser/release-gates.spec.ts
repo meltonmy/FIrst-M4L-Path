@@ -1,5 +1,4 @@
 import {test,expect} from '@playwright/test';
-const blank=()=>({version:1,mode:'explorer',textSize:'standard',reducedMotion:false,lessons:{}});
 test('learner switching restores independent preferences and progress',async({page})=>{
  await page.goto('/#profiles');
  await page.evaluate(()=>{
