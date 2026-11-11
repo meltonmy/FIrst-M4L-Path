@@ -4,6 +4,7 @@ import {ArrowRight,ArrowUpRight,BookOpen,Check,CheckCircle2,ChevronDown,ChevronR
 import {lessons,modules} from './lessons';
 import {AcademyPreview} from './components/AcademyPreview';
 import {ProfilesPage} from './components/ProfilesPage';
+import {saveLearningEvent} from './mastery/integration';
 import {loadSession,activateProfiles,saveSession,selectProfile,addProfile,restoreBackup} from './profiles/session';
 import type {Session} from './profiles/session';
 import type {Academy} from './profiles/learners';
@@ -35,8 +36,20 @@ function App(){
  useEffect(()=>{document.documentElement.dataset.text=progress.textSize;document.documentElement.dataset.motion=progress.reducedMotion?'reduced':'normal';},[progress.textSize,progress.reducedMotion]);
  const completed=lessons.filter(l=>progress.lessons[l.id]?.completed).length;const challenges=lessons.filter(l=>progress.lessons[l.id]?.challenge).length;
  const next=lessons.find(l=>!progress.lessons[l.id]?.completed)||lessons[0];const due=dueLessons(progress);
- const record=(id:string,patch:Partial<RecordProgress>)=>update({...progress,lessons:{...progress.lessons,[id]:{...blankRecord(),...progress.lessons[id],...patch}}});
- const answer=(id:string,correct:boolean)=>update(answerQuestion(progress,id,correct));
+ const evidence=(next:ProgressData,id:string,kind:'recall'|'guided'|'practical',correct:boolean)=>{
+  setProgress(next);
+  try{
+   const saved=saveLearningEvent(localStorage,session,next,{id:crypto.randomUUID(),lessonId:id,activityId:id+'-'+kind,kind,correct,hintsUsed:0,attemptedAt:new Date().toISOString()});
+   setSession(saved);setStorageWarning('');
+  }catch{setStorageWarning('Learning evidence could not be saved. Export your progress before leaving.');}
+ };
+ const record=(id:string,patch:Partial<RecordProgress>)=>{
+  const next={...progress,lessons:{...progress.lessons,[id]:{...blankRecord(),...progress.lessons[id],...patch}}};
+  if(patch.guided)evidence(next,id,'guided',true);
+  else if(patch.challenge)evidence(next,id,'practical',true);
+  else update(next);
+ };
+ const answer=(id:string,correct:boolean)=>evidence(answerQuestion(progress,id,correct),id,'recall',correct);
  const currentLesson=route.startsWith('lesson/')?lessons.find(l=>l.id===route.split('/')[1]):undefined;
  const currentPage=route.startsWith('lesson/')?'path':route;
  useEffect(()=>{setMenu(false);document.title=`${currentLesson?.title||nav.find(n=>n.id===route)?.label||(route==='settings'?'Settings':'Linux Path')} · Linux Path`;},[route]);
