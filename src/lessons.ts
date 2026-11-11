@@ -32,3 +32,6 @@ export const modules=[
  {title:'RHEL administration',description:'SELinux, firewalld, services & troubleshooting'},
  {title:'Home lab missions',description:'Bring Linux, networking & containers together'},
 ];
+
+/** Shared competency mappings; V1 lesson IDs and progress format remain unchanged. */
+export { competencies, validateCompetencies } from './curriculum/competencies';
