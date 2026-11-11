@@ -15,7 +15,7 @@ test('mastery dashboard shows due competency, skill tree and provisional placeme
  await page.reload();
  await expect(page.getByRole('heading',{name:"Original Learner's skills"})).toBeVisible();
  await expect(page.getByRole('heading',{name:"Today's memory missions"})).toBeVisible();
- await expect(page.getByText('Distinguish kernel and distribution — review due')).toBeVisible();
+ await expect(page.getByText('Distinguish kernel and distribution — review due',{exact:true})).toBeVisible();
  await expect(page.getByRole('heading',{name:'Skill tree'})).toBeVisible();
  await expect(page.getByRole('button',{name:'See suggested starting point'})).toBeDisabled();
  const before=await page.evaluate(()=>localStorage.getItem('linux-path-progress-v2'));
